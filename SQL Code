@@ -1,0 +1,119 @@
+-- 1. Summary Statistics (Basic Metrics)
+-- This query provides an overall summary of key metrics like average credit score, age, estimated salary, and how many customers are active or have churned.
+-- Value: These statistics offer a high-level view of customer profiles, helping stakeholders understand the overall health of the customer base.
+
+SELECT 
+    COUNT(*) AS total_customers,
+    AVG(CreditScore) AS avg_credit_score,
+    AVG(Age) AS avg_age,
+    AVG(EstimatedSalary) AS avg_estimated_salary,
+    AVG(Balance) AS avg_balance,
+    SUM(CASE WHEN IsActiveMember = 1 THEN 1 ELSE 0 END) AS active_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers
+FROM churn_modelling;
+
+-- 2. Churn Rate by Geography
+-- This query calculates churn rates per region (Geography), showing how customer retention varies across different regions.
+-- Value: Understanding geographic differences in churn helps the business tailor strategies to specific regions, focusing retention efforts where churn is highest.
+
+SELECT 
+    Geography, 
+    COUNT(CustomerId) AS total_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn_rate_percentage
+FROM churn_modelling
+GROUP BY Geography;
+
+-- 3. Average Balance and Churn Rate by Gender
+-- This query calculates the average balance for each gender and churn rates to determine if there's a correlation between gender and customer churn.
+-- Value: Knowing whether gender plays a role in churn behavior allows for more personalized marketing and retention strategies.
+
+SELECT 
+    Gender,
+    AVG(Balance) AS avg_balance,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn_rate_percentage
+FROM churn_modelling
+GROUP BY Gender;
+
+-- 4. Churn by Number of Products
+-- This query shows how churn rates vary based on the number of products a customer holds.
+-- Value: Helps the business identify whether having more products reduces churn, which could inform cross-selling and product bundling strategies.
+
+SELECT 
+    NumOfProducts, 
+    COUNT(CustomerId) AS total_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn rate_percentage
+FROM churn_modelling
+GROUP BY NumOfProducts;
+
+-- 5. Distribution of Credit Scores
+-- This query groups customers by credit score ranges, helping to understand the distribution of creditworthiness across the customer base.
+-- Value: By knowing the distribution of credit scores, the business can adjust risk management strategies and target high-value, low-risk customers for retention efforts.
+
+SELECT 
+    FLOOR(CreditScore / 100) * 100 AS credit_score_range,
+    COUNT(*) AS customer_count
+FROM churn_modelling
+GROUP BY credit_score_range
+ORDER BY credit_score_range;
+
+-- 6. Age Distribution and Churn Rate by Age Group
+-- This query groups customers by age ranges and calculates the churn rate for each age group.
+-- Value: Age-based churn analysis helps identify if certain age demographics are more likely to leave, enabling age-specific marketing and retention strategies.
+
+SELECT 
+    FLOOR(Age / 10) * 10 AS age_group,
+    COUNT(CustomerId) AS total_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn_rate_percentage
+FROM churn_modelling
+GROUP BY age_group
+ORDER BY age_group;
+
+-- 7. Correlation Between Credit Score and Estimated Salary
+-- This query calculates the correlation between a customer's credit score and their estimated salary.
+-- Value: Understanding whether there is a correlation between salary and credit score provides insights into customer financial stability and helps refine credit risk models.
+
+SELECT 
+    CORR(CreditScore, EstimatedSalary) AS credit_salary_correlation
+FROM churn_modelling;
+
+-- 8. Churn Rate by Credit Score Range
+-- This query calculates churn rates for different credit score ranges, showing how creditworthiness relates to churn.
+-- Value: Identifying churn patterns based on credit score helps target retention strategies for high-risk customers in specific credit brackets.
+
+SELECT 
+    FLOOR(CreditScore / 100) * 100 AS credit_score_range,
+    COUNT(CustomerId) AS total_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn_rate_percentage
+FROM churn_modelling
+GROUP BY credit_score_range
+ORDER BY credit_score_range;
+
+-- 9. Churn Rate by Tenure
+-- This query calculates churn rates for customers based on their tenure (how long they’ve been with the company).
+-- Value: Analyzing churn by tenure helps identify when customers are most at risk of leaving, enabling more timely and effective retention interventions.
+
+SELECT 
+    Tenure, 
+    COUNT(CustomerId) AS total_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn_rate_percentage
+FROM churn_modelling
+GROUP BY Tenure
+ORDER BY Tenure;
+
+-- 10. Churn Rate by Credit Card Ownership
+-- This query shows how churn rates differ between customers who have a credit card and those who do not.
+-- Value: Understanding if credit card ownership influences churn allows the business to develop targeted loyalty programs or upsell strategies for credit card holders.
+
+SELECT 
+    HasCrCard, 
+    COUNT(CustomerId) AS total_customers,
+    SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) AS churned_customers,
+    (SUM(CASE WHEN Exited = 1 THEN 1 ELSE 0 END) / COUNT(CustomerId)) * 100 AS churn_rate_percentage
+FROM churn_modelling
+GROUP BY HasCrCard;
